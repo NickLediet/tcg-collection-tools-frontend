@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia'
-import { CardService } from '../services/cards.service'
+import { ScryfallService } from '../services/scryfall.service'
+import { CardsApiService } from '../services/cards-api.service'
 import * as Scry from 'scryfall-sdk'
+import * as _ from 'lodash'
 
 export interface CardsStoreState {
-    cardService: CardService
     cards: Scry.Card[],
     selectedCard: Scry.Card | null
 }
@@ -17,11 +18,11 @@ export interface CardsStoreGetters {
     cards(): Scry.Card[]
 }
 
-const cardService = new CardService()
+const scryfallService = new ScryfallService()
+const cardsApiService = new CardsApiService()
 
 export const useCardsStore = defineStore<'cards', CardsStoreState, {}, CardsStoreActions>('cards', {
     state: () => ({
-        cardService,
         cards: [],
         selectedCard: null
     }),
@@ -30,7 +31,7 @@ export const useCardsStore = defineStore<'cards', CardsStoreState, {}, CardsStor
         async searchCards(queryString: string): Promise<void> {
             try {
                 this.setSelectedCard(null)
-                const cards = await this.cardService.search(queryString)
+                const cards = await scryfallService.search(queryString)
                 this.cards = cards
             } catch(error) {
                 console.error(error)
@@ -38,9 +39,12 @@ export const useCardsStore = defineStore<'cards', CardsStoreState, {}, CardsStor
             }
         },
 
-        setSelectedCard(selectedCard: Scry.Card | null): void {
+        async setSelectedCard(selectedCard: Scry.Card | null): Promise<void> {
             this.selectedCard = selectedCard
             console.log(this.selectedCard)
+            if(_.isNull(selectedCard)) return
+
+            await cardsApiService.createCard(this.selectedCard as Scry.Card)
         }
         
     }

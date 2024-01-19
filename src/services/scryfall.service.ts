@@ -1,6 +1,6 @@
 import * as Scry from 'scryfall-sdk'
 
-export class CardService {
+export class ScryfallService {
     constructor() {}
 
     public async search(queryString: string): Promise<Scry.Card[]> {

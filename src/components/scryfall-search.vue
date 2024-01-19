@@ -45,7 +45,7 @@ const searchCards = debounce(
 
 const selectCard = ({ value: selectedKey }: AutoCompleteItemSelectEvent) => {
     if(typeof selectedKey !== 'string') return 
-    
+
     const currentCard = suggestionMap.value[selectedKey]
     cardsStore.setSelectedCard(currentCard)
 }
