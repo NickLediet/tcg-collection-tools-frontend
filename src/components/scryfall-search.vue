@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AutoComplete, { AutoCompleteCompleteEvent } from 'primevue/autocomplete'
+import AutoComplete, { AutoCompleteCompleteEvent, AutoCompleteItemSelectEvent } from 'primevue/autocomplete'
 import { ref, watch, computed } from 'vue'
 import * as Scry from 'scryfall-sdk'
 import { useCardsStore } from '../stores/cards.store'
@@ -38,17 +38,25 @@ watch(suggestionMap, (newValue) => {
     console.log('suggestionMap: ', newValue)
 })
 
-const selectCard = debounce(
+const searchCards = debounce(
     ({ query }: AutoCompleteCompleteEvent) => cardsStore.searchCards(query),
     2000
 )
+
+const selectCard = ({ value: selectedKey }: AutoCompleteItemSelectEvent) => {
+    if(typeof selectedKey !== 'string') return 
+    
+    const currentCard = suggestionMap.value[selectedKey]
+    cardsStore.setSelectedCard(currentCard)
+}
 </script>
 
 <template>
     <span class="float-label">
         <AutoComplete 
             v-model="scryfallSearchQuery" 
-            :suggestions="suggestionKeys" 
-            @complete="selectCard" />
+            :suggestions="suggestionKeys"
+            @item-select="selectCard" 
+            @complete="searchCards" />
     </span>
 </template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ScryfallSearch from './components/ScryfallSearch.vue'
+import ScryfallSearch from './components/scryfall-search.vue'
 </script>
 
 <template>
